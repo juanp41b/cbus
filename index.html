@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Consulta de Paradas</title>
+</head>
+<body>
+	<h1>Consulta: Paradas de Bus</h1>
+	<form action="#" method="get">
+		<label for="parada">Parada:</label>
+		<input type="text" id="parada" name="parada">
+		<input type="submit" value="Consultar">
+	</form>
+	<table id="tabla">
+		<thead>
+	 <br><br> 
+		 <tr>
+				<th>Tiempo</th>
+				<th>Linea Bus</th>
+				<th>Destino</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+	
+	<script>
+const form = document.querySelector('form');
+form.addEventListener('submit', function(event) {
+  event.preventDefault();
+  const parada = document.querySelector('#parada').value;
+  const xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === XMLHttpRequest.DONE) {
+      if (xhr.status === 200) {
+        const data = JSON.parse(xhr.responseText);
+        const tbody = document.querySelector('tbody');
+        tbody.innerHTML = '';
+        data.forEach(item => {
+          const tiempo = Math.round(item.seconds / 60);
+          const linea = item.line;
+          const destino = item.destination;
+          const row = `
+            <tr>
+              <<td>${tiempo} min</td>
+              <td>${linea}</td>
+              <td>${destino}</td>
+            </tr>
+          `;
+          tbody.insertAdjacentHTML('beforeend', row);
+        });
+      } else {
+        console.error('Error al recuperar los datos');
+      }
+    }
+  };
+  xhr.open('GET', `https://www.vitoria-gasteiz.org/j16-02w/detalleAction.do?accion=CONSULTA_PARADAS&charset=UTF-8&idParada=${parada}`);
+  xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
+  xhr.send();
+});
+	</script>
+</body>
+</html>
